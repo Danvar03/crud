@@ -1,29 +1,52 @@
-import React, { useState } from "react";
-import { isEmpty, size } from "lodash";
-import shortid from "shortid";
+import React, { useState } from "react"
+import { isEmpty, size } from "lodash"
+import shortid from "shortid"
 
 function App() {
-  const [task, settask] = useState("");
-  const [tasks, setTasks] = useState([]);
+  const [task, setTask] = useState("")
+  const [tasks, setTasks] = useState([])
+  const [editMode, setEditMode] = useState(false) 
+  const [id, setId] = useState("")  
+ 
 
   const addTask = (e) => {
-    e.preventDefault();
+    e.preventDefault()
     if (isEmpty(task)) {
-      console.log("Task empty");
-      return;
+      console.log("Task empty")
+      return
     }
     const newTask = {
       id: shortid.generate(),
       name: task,
-    };
-    setTasks([...tasks, newTask]);
-    settask("");
-  };
+    }
+    setTasks([...tasks, newTask])
+    setTask("")
+  }
+
+  const saveTask = (e) => {
+    e.preventDefault()
+    if (isEmpty(task)) {
+      console.log("Task empty")
+      return
+    }
+    
+    const editedTasks = tasks.map(item => item.id === id ? {id, name : task}  : item )
+    setTasks(editedTasks)
+    setEditMode(false)
+    setTask("") 
+    setId("")   
+  }
 
   const deleteTask = (id) => {
-    const fileteredTasks = tasks.filter((task) => task.id !== id);
-    setTasks(fileteredTasks);
-  };
+    const fileteredTasks = tasks.filter((task) => task.id !== id)
+    setTasks(fileteredTasks)
+  }
+
+  const editTask = (theTask) => {
+    setTask(theTask.name)
+    setEditMode(true)
+    setId(theTask.id)
+  }
 
   return (
     <div className="container mt-5">
@@ -46,7 +69,10 @@ function App() {
                   >
                     Eliminar
                   </button>
-                  <button className="btn btn-warning btn-sm float-right">
+                  <button
+                    className="btn btn-warning btn-sm float-right"
+                    onClick={() => editTask(task)}
+                  >
                     Editar
                   </button>
                 </li>
@@ -55,22 +81,25 @@ function App() {
           )}
         </div>
         <div className="col-4">
-          <h4 className="text-center"> Agregar Tarea</h4>
-          <form onSubmit={addTask}>
+          <h4 classNsame="text-center">
+            {editMode ? "Modificar tarea" : "Agregar Tarea"}
+          </h4>
+          <form onSubmit= {editMode ? saveTask : addTask}>
             <input
               type="text"
               className="form-contol mb-2"
               placeholder="Ingrese la tarea..."
-              onChange={(text) => settask(text.target.value)}
+              onChange={(text) => setTask(text.target.value)}
               value={task}
             />
-            <button className="btn btn-dark btn-block" type="submit">
-              Agregar
+            <button className= {editMode ? "btn btn-warning" : "btn btn-dark btn-block" } 
+              type="submit">
+              {editMode ? "Guardar" : "Agregar"}
             </button>
           </form>
         </div>
       </div>
     </div>
-  );
+  )
 }
-export default App;
+export default App
